@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/maddclif24/backend-project-lvl3#readme",
   "devDependencies": {
-    "eslint": "^8.10.0"
+    "eslint": "^8.10.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.25.4"
   }
 }
