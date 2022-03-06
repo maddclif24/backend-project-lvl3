@@ -4,8 +4,11 @@
   "description": "[![Actions Status](https://github.com/maddclif24/backend-project-lvl3/workflows/hexlet-check/badge.svg)](https://github.com/maddclif24/backend-project-lvl3/actions)",
   "main": "index.js",
   "type": "module",
+  "bin": {
+    "page-loader": "src/page-loader.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx -n --experimental-vm-modules"
   },
   "repository": {
     "type": "git",
@@ -18,9 +21,14 @@
   },
   "homepage": "https://github.com/maddclif24/backend-project-lvl3#readme",
   "devDependencies": {
+    "@jest/globals": "^27.5.1",
     "eslint": "^8.10.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-import": "^2.25.4",
     "jest": "^27.5.1"
+  },
+  "dependencies": {
+    "axios": "^0.26.0",
+    "commander": "^9.0.0"
   }
 }
