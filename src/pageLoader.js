@@ -13,37 +13,39 @@ const parseFileName = (path) => {
   return { indexHTML, mediaDirName };
 };
 
+const genImageSrc = (dirName, hostName, src) => {
+  const normalizedSrc = path.normalize(src).split('/').join('-');
+  const parsedHostname = hostName.split('.').join('-');
+  return `${dirName}/${parsedHostname}${normalizedSrc}`;
+}
+
 
 export default async (link, pathDir = process.cwd()) => {
-  console.log(link);
   axios.get(link).then((res) => {
     const { data } = res;
+    const { hostname } = new URL(link);
+    const { indexHTML, mediaDirName } = parseFileName(link);
     const $ = cheerio.load(data);
     const images = Array.from($('img'));
-    // console.log(images);
-    const { hostname } = new URL(link);
-    console.log(hostname);
-    // Циклом пройтись и строить пути до картинок
-    const { indexHTML, mediaDirName }= parseFileName(link);
-    fs.writeFile(`${pathDir}/${indexHTML}`, data, (err) => err);
-    fs.mkdir(`${pathDir}/${mediaDirName}`, (err) => err)
+    fs.mkdir(path.join(pathDir, mediaDirName), (err) => err)
     .then(() => {
       images.forEach((img) => {
         const imgSrc = img.attribs.src;
         axios.get(`https://${hostname}${imgSrc}`, { responseType: 'arraybuffer' })
         .then(({ data }) => {
-          // console.log(data);
-          // const extname = path.extname(imgSrc);
-          console.log(imgSrc);
-          const normalizedSrc = path.normalize(imgSrc).split('/').join('-');
-          const parsedHostname = hostname.split('.').join('-') 
-          fs.writeFile(`${mediaDirName}/${parsedHostname}${normalizedSrc}`, data, 'base64', (err) => err);  
+          const fileName = genImageSrc(mediaDirName, hostname, imgSrc);
+          fs.writeFile(fileName, data, 'base64', (err) => err);
         })
         .catch((error) => console.log(error));
       })
     })
+    .then(() => {
+      $('img').replaceWith(function() {
+        const src = $(this).attr('src');
+        return $(this).attr('src', src.replace(src, genImageSrc(mediaDirName, hostname, src)));
+      });
+    })
+    .then(() => fs.writeFile(path.join(pathDir, indexHTML), $.html(), (err) => err));
   })
   .catch((error) => console.log(error.message));
-  
 };
-// https://en.lyrsense.com/images/userDefault.png
