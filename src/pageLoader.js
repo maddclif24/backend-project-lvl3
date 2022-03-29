@@ -4,6 +4,11 @@ import process from 'process';
 import * as cheerio from 'cheerio';
 import path from 'path';
 
+import { addLogger } from 'axios-debug-log';
+
+import Debug from 'debug';
+
+const debug = Debug('page-loader');
 
 const parseFileName = (path) => {
   const { origin } = new URL(path);
@@ -43,13 +48,16 @@ const canDownload = (href, hostName) => {
 
 
 const downLoadResourse = (dirName, resourcePath, hostName) => {
-  console.log(resourcePath, '------------------------------------')
   if (canDownload(resourcePath, hostName)) {
     const url = isUrl(resourcePath) ? resourcePath : `https://${hostName}${resourcePath}`;
-    axios.get(url, { responseType: 'arraybuffer' })
+    const download = axios.create({ baseURL: `https://${hostName}/` });
+
+    addLogger(download, debug);
+    download(url, { responseType: 'arraybuffer' })
     .then(({ data }) => {
       const fileName = genFileName(dirName, hostName, resourcePath);
       const encoding = data.name === 'img' ? 'base64' : 'utf-8';
+      debug(`Create ${fileName}`);
       fs.writeFile(fileName, data, encoding, (err) => err);
   })
     .catch((error) => console.log(error));
@@ -81,7 +89,6 @@ export default async (link, pathDir = process.cwd()) => {
         }
         else {
           const resourcePath = resources.attribs.href ? resources.attribs.href : resources.attribs.src;
-          console.log(resources.name, resources.attribs.href, resources.attribs.src, genFileName(mediaDirName, hostname, resourcePath), 'CHECK__CHECK');
           downLoadResourse(mediaDirName, resourcePath, hostname);
         }
       })
