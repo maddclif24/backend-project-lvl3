@@ -94,13 +94,14 @@ export default async (link, pathDir = process.cwd()) => {
       })
     })
     .then(() => {
-      // Менять пути у всех ресурсов (Функция)
-      $('img').replaceWith(function() {
+      // Заменяем src пути на локальные
+      $('img').each(function() {
         const src = $(this).attr('src');
-        return $(this).attr('src', src.replace(src, genFileName(mediaDirName, hostname, src)));
+        $(this).attr('src', genFileName(mediaDirName, hostname, src));
       });
-    })
-    .then(() => fs.writeFile(path.join(pathDir, indexHTML), $.html(), (err) => err));
+
+      fs.writeFile(path.join(pathDir, indexHTML), $.html(), (err) => err)
+    });
   })
   .catch((error) => console.log(error.message));
 };
