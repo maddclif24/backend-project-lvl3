@@ -100,6 +100,20 @@ export default async (link, pathDir = process.cwd()) => {
         $(this).attr('src', genFileName(mediaDirName, hostname, src));
       });
 
+      $('script').each(function() {
+        const src = $(this).attr('src');
+        if (canDownload(src)) {
+          $(this).attr('src', genFileName(mediaDirName, hostname, src));
+        }
+      });
+
+      $('link').each(function() {
+        const href = $(this).attr('href');
+        if (canDownload(href)) {
+          $(this).attr('href', genFileName(mediaDirName, hostname, href));
+        }
+      });
+
       fs.writeFile(path.join(pathDir, indexHTML), $.html(), (err) => err)
     });
   })
