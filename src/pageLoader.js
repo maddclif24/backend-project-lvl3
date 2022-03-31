@@ -26,7 +26,6 @@ const genFileName = (dirName, hostName, src) => {
     const url = new URL(src);
     const splitSrc = url.pathname.split('/').join('').split('.').join('-');
     normalizedSrc = [parsedHostname, splitSrc].join('-');
-    console.log(`${dirName}/${normalizedSrc}`)
     return `${dirName}/${normalizedSrc}`
   }
   normalizedSrc = path.normalize(src).split('/').join('-');
@@ -36,6 +35,9 @@ const genFileName = (dirName, hostName, src) => {
 const isUrl = (str) => str.startsWith('http');
 
 const canDownload = (href, hostName) => {
+  if (!href) {
+    return false;
+  }
   if (isUrl(href)) {
     const { hostname } = new URL(href);
     return hostname === hostName;
@@ -75,22 +77,15 @@ export default async (link, pathDir = process.cwd()) => {
     // Достать все ресурсы
     const images = Array.from($('img'));
     const links = Array.from($('link'));
-    const scripts = Array.from($('script'));
+    const scripts = Array.from($('script')).filter((script) => script.attribs.src);
     const resources = [...images, ...links, ...scripts];
 
 
     fs.mkdir(path.join(pathDir, mediaDirName), (err) => err)
     .then(() => {
-      resources.forEach((resources) => {
-        if (resources.name === 'script') {
-          if (resources.attribs.src) {
-            downLoadResourse(mediaDirName, resources.attribs.src, hostname);
-          }
-        }
-        else {
-          const resourcePath = resources.attribs.href ? resources.attribs.href : resources.attribs.src;
-          downLoadResourse(mediaDirName, resourcePath, hostname);
-        }
+      resources.forEach(({ attribs }) => {
+        const source = attribs.href ? attribs.href : attribs.src;
+        downLoadResourse(mediaDirName, source, hostname);
       })
     })
     .then(() => {
