@@ -96,17 +96,10 @@ export default async (link, pathDir = process.cwd()) => {
     .then(() => {
       // Заменяем пути на локальные
       $('img, script, link').each(function() {
-        const { name } = $(this)[0];
-
-        if (name === 'link') {
-          const href = $(this).attr('href')
-          const updatedHref = canDownload(href) ? genFileName(mediaDirName, hostname, href) : href;
-          $(this).attr('href', updatedHref);
-        } else {
-          const src = $(this).attr('src');
-          const updatedSrc = canDownload(src) ? genFileName(mediaDirName, hostname, src) : src;
-          $(this).attr('src', updatedSrc);
-        }
+        const attribute = $(this).attr('href') ? 'href' : 'src';
+        const source = $(this).attr(attribute);
+        const validSource = canDownload(source) ? genFileName(mediaDirName, hostname, source) : source;
+        $(this).attr(attribute, validSource);
       });
 
       fs.writeFile(path.join(pathDir, indexHTML), $.html(), (err) => err)
