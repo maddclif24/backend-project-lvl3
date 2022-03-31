@@ -94,23 +94,18 @@ export default async (link, pathDir = process.cwd()) => {
       })
     })
     .then(() => {
-      // Заменяем src пути на локальные
-      $('img').each(function() {
-        const src = $(this).attr('src');
-        $(this).attr('src', genFileName(mediaDirName, hostname, src));
-      });
+      // Заменяем пути на локальные
+      $('img, script, link').each(function() {
+        const { name } = $(this)[0];
 
-      $('script').each(function() {
-        const src = $(this).attr('src');
-        if (canDownload(src)) {
-          $(this).attr('src', genFileName(mediaDirName, hostname, src));
-        }
-      });
-
-      $('link').each(function() {
-        const href = $(this).attr('href');
-        if (canDownload(href)) {
-          $(this).attr('href', genFileName(mediaDirName, hostname, href));
+        if (name === 'link') {
+          const href = $(this).attr('href')
+          const updatedHref = canDownload(href) ? genFileName(mediaDirName, hostname, href) : href;
+          $(this).attr('href', updatedHref);
+        } else {
+          const src = $(this).attr('src');
+          const updatedSrc = canDownload(src) ? genFileName(mediaDirName, hostname, src) : src;
+          $(this).attr('src', updatedSrc);
         }
       });
 
