@@ -3,6 +3,7 @@ import * as fs from 'fs/promises';
 import process from 'process';
 import * as cheerio from 'cheerio';
 import path from 'path';
+import Listr from 'listr';
 
 import { addLogger } from 'axios-debug-log';
 
@@ -48,22 +49,23 @@ const canDownload = (href, hostName) => {
   return true;
 };
 
+const createFile = (fileName, data) => {
+  const encoding = data.name === 'img' ? 'base64' : 'utf-8';
+  fs.writeFile(fileName, data, encoding, (err) => err);
+};
+
 
 const downLoadResourse = (dirName, resourcePath, hostName) => {
   if (canDownload(resourcePath, hostName)) {
     const url = isUrl(resourcePath) ? resourcePath : `https://${hostName}${resourcePath}`;
+    const fileName = genFileName(dirName, hostName, resourcePath);
     const download = axios.create({ baseURL: `https://${hostName}/` });
 
     addLogger(download, debug);
-    download(url, { responseType: 'arraybuffer' })
-    .then(({ data }) => {
-      const fileName = genFileName(dirName, hostName, resourcePath);
-      const encoding = data.name === 'img' ? 'base64' : 'utf-8';
-      debug(`Create ${fileName}`);
-      fs.writeFile(fileName, data, encoding, (err) => err);
-  })
-    .catch((error) => console.log(error));
+    return download(url, { responseType: 'arraybuffer' })
+      .then(({ data }) => createFile(fileName, data))
   }
+  return Promise.resolve();
 };
 
 
@@ -83,10 +85,17 @@ export default async (link, pathDir = process.cwd()) => {
 
     fs.mkdir(path.join(pathDir, mediaDirName), (err) => err)
     .then(() => {
-      resources.forEach(({ attribs }) => {
+      const promises = resources.map(({ attribs }) => {
         const source = attribs.href ? attribs.href : attribs.src;
-        downLoadResourse(mediaDirName, source, hostname);
+        return {
+          title: `${link}${source.slice(1)}`,
+          task: () => downLoadResourse(mediaDirName, source, hostname).catch((e) => {
+            return Promise.reject(new Error(e.response.statusText));
+          }),
+        }
       })
+      const tasks = new Listr(promises, { concurrent: true, exitOnError: false });
+      return tasks.run().catch(e => e);
     })
     .then(() => {
       // Заменяем пути на локальные
@@ -100,5 +109,5 @@ export default async (link, pathDir = process.cwd()) => {
       fs.writeFile(path.join(pathDir, indexHTML), $.html(), (err) => err)
     });
   })
-  .catch((error) => console.log(error.message));
+  .catch((error) => error);
 };
