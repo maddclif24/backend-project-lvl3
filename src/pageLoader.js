@@ -56,16 +56,13 @@ const createFile = (fileName, data) => {
 
 
 const downLoadResourse = (dirName, resourcePath, hostName) => {
-  if (canDownload(resourcePath, hostName)) {
-    const url = isUrl(resourcePath) ? resourcePath : `https://${hostName}${resourcePath}`;
-    const fileName = genFileName(dirName, hostName, resourcePath);
-    const download = axios.create({ baseURL: `https://${hostName}/` });
+  const url = isUrl(resourcePath) ? resourcePath : `https://${hostName}${resourcePath}`;
+  const fileName = genFileName(dirName, hostName, resourcePath);
+  const download = axios.create({ baseURL: `https://${hostName}/` });
 
-    addLogger(download, debug);
-    return download(url, { responseType: 'arraybuffer' })
-      .then(({ data }) => createFile(fileName, data))
-  }
-  return Promise.resolve();
+  addLogger(download, debug);
+  return download(url, { responseType: 'arraybuffer' })
+    .then(({ data }) => createFile(fileName, data));
 };
 
 
@@ -89,8 +86,10 @@ export default async (link, pathDir = process.cwd()) => {
         const source = attribs.href ? attribs.href : attribs.src;
         return {
           title: `${link}${source.slice(1)}`,
-          task: () => downLoadResourse(mediaDirName, source, hostname).catch((e) => {
-            return Promise.reject(new Error(e.response.statusText));
+          enabled: () => canDownload(source, hostname),
+          task: () => downLoadResourse(mediaDirName, source, hostname).catch((error) => {
+            const description = error.message ? error.message : error.response.statusText;
+            return Promise.reject(new Error(description));
           }),
         }
       })
