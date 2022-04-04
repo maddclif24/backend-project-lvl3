@@ -58,12 +58,11 @@ const downLoadResourse = (mediaDirName, resourcePath, hostname) => {
 };
 
 const loadResources = (html, { hostname, pathDir, mediaDirName, url }) => {
-  const images = Array.from(html('img'));
-  const links = Array.from(html('link'));
+  const media = Array.from(html('img, link'));
   const scripts = Array.from(html('script')).filter(
-    (script) => script.attribs.src
+    (resource) => resource.attribs.src
   );
-  const resources = [...images, ...links, ...scripts];
+  const resources = [...media, ...scripts];
 
   const promises = resources.map(({ attribs }) => {
     const source = attribs.href ? attribs.href : attribs.src;
