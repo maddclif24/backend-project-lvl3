@@ -1,16 +1,30 @@
 import pageLoader from '../src/pageLoader.js';
 import { test, expect, beforeEach } from '@jest/globals';
 import * as fs from 'fs/promises';
+import nock from 'nock';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import os from 'os';
+import path from 'path';
+import { readdir } from 'fs';
+
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 
 beforeEach(async () => {
-    await pageLoader('https://ru.hexlet.io/courses');
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-hexlet-repl-co.html'));
+    await pageLoader('https://page-loader.hexlet.repl.co/', dir);
 })
 
+const getFixturePath = (filename) => `${__dirname}/../__fixtures__/${filename}`;
 
-test('file-exist', async () => {
-    const downLoadPagePath = '../src/ru-hexlet-io-courses.html';
-    // await pageLoader('https://ru.hexlet.io/courses');
-    const fileStats = await fs.readFile(downLoadPagePath);
-    console.log(fileStats)
-    // await expect(fileStats.isFile()).toBe(true);
+
+test('Load hexlet-repl', async () => {
+    nock('https://page-loader.hexlet.repl.co/')
+    .get('/assets/professions/nodejs.png')
+    .reply(200)
+    
 });
+
+
