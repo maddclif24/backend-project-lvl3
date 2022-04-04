@@ -5,7 +5,7 @@ lint:
 test:
 	NODE_OPTIONS=--experimental-vm-modules npx jest
 test-coverage:
-	npm test -- --coverage --coverageProvider=v8
+	make test -- --coverage --coverageProvider=v8
 publish:
 	npm publish
 hex:
