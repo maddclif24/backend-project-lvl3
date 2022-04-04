@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 import pageLoader from "./pageLoader.js";
-
 import { program } from 'commander';
-
 import process from 'process';
 
 program
@@ -11,7 +9,6 @@ program
   .description('Page loader utility')
   .option('-o, --output [dir]', `output dir (default: "${process.cwd()}")`)
   .action((link, path) => {
-    // console.log(link, path.output);
-    pageLoader(link, path.output)
+    pageLoader(link, path.output);
   })
   .parse();
