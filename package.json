@@ -8,7 +8,7 @@
     "page-loader": "src/page-loader.js"
   },
   "scripts": {
-    "test": "npx -n --experimental-vm-modules"
+    "test": "npx -n '--experimental-vm-modules --no-warnings' jest --colors"
   },
   "repository": {
     "type": "git",
