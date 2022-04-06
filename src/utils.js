@@ -12,10 +12,12 @@ const parseFileName = (path) => {
   return { indexHTML, mediaDirName };
 };
 
+const isUrl = (str) => str.startsWith('http');
+
 const genFileName = (src, { hostname, mediaDirName }) => {
   let normalizedSrc;
   const parsedHostname = hostname.split('.').join('-');
-  if (src.includes('https') || src.includes('http')) {
+  if (isUrl(src)) {
     const url = new URL(src);
     const splitSrc = url.pathname.split('/').join('').split('.').join('-');
     normalizedSrc = [parsedHostname, splitSrc].join('-');
@@ -24,8 +26,6 @@ const genFileName = (src, { hostname, mediaDirName }) => {
   normalizedSrc = path.normalize(src).split('/').join('-');
   return path.join(mediaDirName, parsedHostname).concat(normalizedSrc);
 };
-
-const isUrl = (str) => str.startsWith('http');
 
 const canLoad = (href, hostName) => {
   if (!href) {
