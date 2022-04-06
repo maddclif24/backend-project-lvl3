@@ -1,4 +1,4 @@
-import { test, expect, beforeEach, describe } from '@jest/globals';
+import { test, expect, beforeEach } from '@jest/globals';
 import * as fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
@@ -31,38 +31,35 @@ beforeEach(async () => {
     text = await readFile('text');
 });
 
-/* test('html-exist', async () => {
+
+test('Load resources', async () => {
     nock('https://page-loader.hexlet.repl.co/')
         .get('/')
-        .reply(200, beforeHtml);
-    await pageLoader('https://page-loader.hexlet.repl.co/', tempDir);
-    const [fileName] = await fs.readdir(tempDir);
-    const html = await fs.readFile(path.join(tempDir, fileName), 'utf-8');
-    expect(html).toEqual(afterHtml);
-}); */
-
-
-describe('load resources', () => {
-    test('css', async () => {
-        nock('https://page-loader.hexlet.repl.co/')
-            .get('/')
-            .reply(200, beforeHtml)
-        nock('https://page-loader.hexlet.repl.co/')
-            .get('/assets/application.css')
-            .reply(200, css)
-        nock('https://page-loader.hexlet.repl.co/')
-            .get('/courses')
-            .reply(200, text)
-        nock('https://page-loader.hexlet.repl.co/')
-            .get('/assets/professions/nodejs.png')
-            .reply(200, image)
-        nock('https://page-loader.hexlet.repl.co/')
-            .get('/script.js')
-            .reply(200, script);
+        .reply(200, beforeHtml)
+        .get('/assets/application.css')
+        .reply(200, css)
+    nock('https://page-loader.hexlet.repl.co/')
+        .get('/courses')
+        .reply(200, text)
+    nock('https://page-loader.hexlet.repl.co/')
+        .get('/assets/professions/nodejs.png')
+        .reply(200, image)
+    nock('https://page-loader.hexlet.repl.co/')
+        .get('/script.js')
+        .reply(200, script);
             
-        await pageLoader('https://page-loader.hexlet.repl.co/', tempDir);
-        const data = await fs.readdir(tempDir);
-        const data2 = await fs.readdir(path.join(tempDir, data[1]));
-        console.log(data2);
-    });
+    await pageLoader('https://page-loader.hexlet.repl.co/', tempDir);
+    const data = await fs.readdir(tempDir);
+    const data2 = await fs.readdir(path.join(tempDir, data[1]));
+    const [ cssName, imageName, textName, scriptName ] = data2;
+    const readCss = await fs.readFile(path.join(tempDir, data[1], cssName), 'utf-8');
+    const readImage = await fs.readFile(path.join(tempDir, data[1], imageName), 'utf-8');
+    const readText = await fs.readFile(path.join(tempDir, data[1], textName), 'utf-8');
+    const readScript = await fs.readFile(path.join(tempDir, data[1], scriptName), 'utf-8');
+    const html = await fs.readFile(path.join(tempDir, data[0]), 'utf-8');
+    expect(html).toEqual(afterHtml);
+    expect(css).toEqual(readCss);
+    expect(image).toEqual(readImage);
+    expect(text).toEqual(readText);
+    expect(script).toEqual(readScript);
 });

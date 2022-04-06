@@ -9,27 +9,23 @@ export default async (url, pathDir = process.cwd()) => {
   const { indexHTML, mediaDirName } = parseFileName(url);
   const { hostname } = new URL(url);
   const config = { hostname, mediaDirName, url, pathDir };
-  let domTree;
+
   return axios.get(url)
   .then(({ data }) => {
     fs.mkdir(path.join(pathDir, mediaDirName))
-    domTree = cheerio.load(data);
-    // return cheerio.load(data);
-    return domTree;
-  })
-  .then(() => {
-    return loadResources(domTree, config);
-    // return html;
-  })
-  .then(() => {
-    domTree('img, script, link').each(function() {
-      const attribute = domTree(this).attr('href') ? 'href' : 'src';
-      const source = domTree(this).attr(attribute);
-      const validSource = canLoad(source) ? genFileName(source, config) : source;
-      domTree(this).attr(attribute, validSource);
+    const domThree = cheerio.load(data);
+    const oldPaths = [];
+    domThree('img, script, link').each((i, elem) => {
+      const attribute = domThree(elem).attr('href') ? 'href' : 'src';
+      const source = domThree(elem).attr(attribute);
+      const validSource = canLoad(source) ? (oldPaths.push(source), genFileName(source, config)) : source;
+      domThree(elem).attr(attribute, validSource);
     });
-    return domTree;
+    fs.writeFile(path.join(pathDir, indexHTML), domThree.html());
+    return oldPaths;
   })
-  .then((domTree) => fs.writeFile(path.join(pathDir, indexHTML), domTree.html()))
+  .then((paths) => {
+    return loadResources(paths, config);
+  })
   .catch((error) => console.log(error));
 };
