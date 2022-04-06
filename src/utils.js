@@ -7,8 +7,8 @@ const parseFileName = (path) => {
   const { origin } = new URL(path);
   const [, slicePath] = origin.split('://');
   const result = slicePath.split('.').join('-').split('/').join('-');
-  const indexHTML = `${result}.html`;
-  const mediaDirName = `${result}_files`;
+  const indexHTML = result.concat('.html');
+  const mediaDirName = result.concat('_files');
   return { indexHTML, mediaDirName };
 };
 
@@ -19,10 +19,10 @@ const genFileName = (src, { hostname, mediaDirName }) => {
     const url = new URL(src);
     const splitSrc = url.pathname.split('/').join('').split('.').join('-');
     normalizedSrc = [parsedHostname, splitSrc].join('-');
-    return `${mediaDirName}/${normalizedSrc}`;
+    return path.join(mediaDirName, normalizedSrc);
   }
   normalizedSrc = path.normalize(src).split('/').join('-');
-  return `${mediaDirName}/${parsedHostname}${normalizedSrc}`;
+  return path.join(mediaDirName, parsedHostname).concat(normalizedSrc);
 };
 
 const isUrl = (str) => str.startsWith('http');
@@ -46,16 +46,12 @@ const createFile = (fileName, pathDir, data) => {
 };
 
 const downLoadResourse = (resourcePath, hostname) => {
-  const url = isUrl(resourcePath)
-    ? resourcePath
-    : `https://${hostname}${resourcePath}`;
+  const url = isUrl(resourcePath) ? resourcePath : `https://${hostname}${resourcePath}`;
   return axios.get(url, { responseType: 'arraybuffer' });
 };
 
 const loadResources = (paths, { hostname, mediaDirName, pathDir, url }) => {
-  const resources = paths.filter((path) => path);
-
-  const promises = resources.map((path) => {
+  const promises = paths.map((path) => {
     const fileName = genFileName(path, { hostname, pathDir, mediaDirName });
     const title = `${url}${path.slice(1)}`;
     return {
@@ -63,17 +59,14 @@ const loadResources = (paths, { hostname, mediaDirName, pathDir, url }) => {
       enabled: () => canLoad(path, hostname),
       task: () =>
         downLoadResourse(path, hostname)
-        .then(({ data }) => {
-          return createFile(fileName, pathDir, data)
-        })
-        .catch((error) => {
-          const description = error.message
-            ? error.message
-            : error.response.statusText;
-          return Promise.reject(new Error(description));
-        }),
+          .then(({ data }) => createFile(fileName, pathDir, data))
+          .catch((error) => {
+            const description = error.message ? error.message : error.response.statusText;
+            return Promise.reject(new Error(description));
+          }),
     };
   });
+
   const tasks = new Listr(promises, { concurrent: true, exitOnError: false });
   return tasks.run().catch((e) => e);
 };

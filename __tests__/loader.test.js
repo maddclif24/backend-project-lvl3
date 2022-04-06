@@ -49,14 +49,15 @@ test('Load resources', async () => {
         .reply(200, script);
             
     await pageLoader('https://page-loader.hexlet.repl.co/', tempDir);
-    const data = await fs.readdir(tempDir);
-    const data2 = await fs.readdir(path.join(tempDir, data[1]));
-    const [ cssName, imageName, textName, scriptName ] = data2;
-    const readCss = await fs.readFile(path.join(tempDir, data[1], cssName), 'utf-8');
-    const readImage = await fs.readFile(path.join(tempDir, data[1], imageName), 'utf-8');
-    const readText = await fs.readFile(path.join(tempDir, data[1], textName), 'utf-8');
-    const readScript = await fs.readFile(path.join(tempDir, data[1], scriptName), 'utf-8');
-    const html = await fs.readFile(path.join(tempDir, data[0]), 'utf-8');
+    const [htmlName, mediaDirName] = await fs.readdir(tempDir);
+    const mediaDir = await fs.readdir(path.join(tempDir, mediaDirName));
+    const [cssName, imageName, textName, scriptName] = mediaDir;
+    const readCss = await fs.readFile(path.join(tempDir, mediaDirName, cssName), 'utf-8');
+    const readImage = await fs.readFile(path.join(tempDir, mediaDirName, imageName), 'utf-8');
+    const readText = await fs.readFile(path.join(tempDir, mediaDirName, textName), 'utf-8');
+    const readScript = await fs.readFile(path.join(tempDir, mediaDirName, scriptName), 'utf-8');
+    const html = await fs.readFile(path.join(tempDir, htmlName), 'utf-8');
+
     expect(html).toEqual(afterHtml);
     expect(css).toEqual(readCss);
     expect(image).toEqual(readImage);
