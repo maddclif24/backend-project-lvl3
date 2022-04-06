@@ -15,8 +15,10 @@ const readFile = (filename, encoding = 'utf-8') => fs.readFile(getFixturePath(fi
 let tempDir;
 let beforeHtml;
 let afterHtml;
-
 let css;
+let image;
+let script;
+let text;
 
 
 beforeEach(async () => {
@@ -24,9 +26,12 @@ beforeEach(async () => {
     beforeHtml = await readFile('before.html');
     afterHtml = await readFile('after.html');
     css = await readFile('main.css');
+    image = await readFile('img.png', 'base64');
+    script = await readFile('script.js');
+    text = await readFile('text');
 });
 
-test('html-exist', async () => {
+/* test('html-exist', async () => {
     nock('https://page-loader.hexlet.repl.co/')
         .get('/')
         .reply(200, beforeHtml);
@@ -34,19 +39,30 @@ test('html-exist', async () => {
     const [fileName] = await fs.readdir(tempDir);
     const html = await fs.readFile(path.join(tempDir, fileName), 'utf-8');
     expect(html).toEqual(afterHtml);
-});
+}); */
 
 
 describe('load resources', () => {
-    test('image', async () => {
+    test('css', async () => {
         nock('https://page-loader.hexlet.repl.co/')
             .get('/')
             .reply(200, beforeHtml)
+        nock('https://page-loader.hexlet.repl.co/')
             .get('/assets/application.css')
-            .reply(200, css);
+            .reply(200, css)
+        nock('https://page-loader.hexlet.repl.co/')
+            .get('/courses')
+            .reply(200, text)
+        nock('https://page-loader.hexlet.repl.co/')
+            .get('/assets/professions/nodejs.png')
+            .reply(200, image)
+        nock('https://page-loader.hexlet.repl.co/')
+            .get('/script.js')
+            .reply(200, script);
             
         await pageLoader('https://page-loader.hexlet.repl.co/', tempDir);
-        const data = await fs.readdir(path.join(tempDir, 'page-loader-hexlet-repl-co_files'));
-        console.log(data);
+        // const data = await fs.readdir(tempDir);
+        // const data2 = await fs.readdir(path.join(tempDir, data));
+        // console.log(await fs.readFile(path.join(tempDir, data[0]), 'utf-8'));
     });
 });

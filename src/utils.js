@@ -40,24 +40,19 @@ const canLoad = (href, hostName) => {
   return true;
 };
 
-const createFile = (fileName, data) => {
+const createFile = (fileName, pathDir, data) => {
   const encoding = data.name === 'img' ? 'base64' : 'utf-8';
-  fs.writeFile(fileName, data, encoding, (err) => err);
+  return fs.writeFile(path.join(pathDir, fileName), data, encoding, (err) => err);
 };
 
-const downLoadResourse = (mediaDirName, resourcePath, hostname) => {
+const downLoadResourse = (resourcePath, hostname) => {
   const url = isUrl(resourcePath)
     ? resourcePath
     : `https://${hostname}${resourcePath}`;
-  const fileName = genFileName(resourcePath, { hostname, mediaDirName });
-  const download = axios.create({ baseURL: `https://${hostname}/` });
-
-  return download(url, { responseType: 'arraybuffer' }).then(({ data }) => {
-    return createFile(fileName, data)
-  });
+  return axios.get(url, { responseType: 'arraybuffer' });
 };
 
-const loadResources = (html, { hostname, pathDir, mediaDirName, url }) => {
+const loadResources = (html, { hostname, mediaDirName, pathDir, url }) => {
   const media = Array.from(html('img, link'));
   const scripts = Array.from(html('script')).filter(
     (resource) => resource.attribs.src
@@ -66,15 +61,17 @@ const loadResources = (html, { hostname, pathDir, mediaDirName, url }) => {
 
   const promises = resources.map(({ attribs }) => {
     const source = attribs.href ? attribs.href : attribs.src;
+    const fileName = genFileName(source, { hostname, pathDir, mediaDirName });
+
     return {
       title: `${url}${source.slice(1)}`,
       enabled: () => canLoad(source, hostname),
       task: () =>
-        downLoadResourse(
-          path.join(pathDir, mediaDirName),
-          source,
-          hostname
-        ).catch((error) => {
+        downLoadResourse(source, hostname)
+        .then(({ data }) => {
+          return createFile(fileName, pathDir, data)
+        })
+        .catch((error) => {
           const description = error.message
             ? error.message
             : error.response.statusText;
@@ -87,8 +84,8 @@ const loadResources = (html, { hostname, pathDir, mediaDirName, url }) => {
 };
 
 export {
-    loadResources,
-    canLoad,
-    genFileName,
-    parseFileName,
+  loadResources,
+  canLoad,
+  genFileName,
+  parseFileName,
 };
