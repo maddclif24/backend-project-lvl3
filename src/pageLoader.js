@@ -9,25 +9,27 @@ export default async (url, pathDir = process.cwd()) => {
   const { indexHTML, mediaDirName } = parseFileName(url);
   const { hostname } = new URL(url);
   const config = { hostname, mediaDirName, url, pathDir };
-
+  let domTree;
   return axios.get(url)
   .then(({ data }) => {
     fs.mkdir(path.join(pathDir, mediaDirName))
-    return cheerio.load(data);
+    domTree = cheerio.load(data);
+    // return cheerio.load(data);
+    return domTree;
   })
-  .then((html) => {
-    loadResources(html, config);
-    return html;
+  .then(() => {
+    return loadResources(domTree, config);
+    // return html;
   })
-  .then((html) => {
-    html('img, script, link').each(function() {
-      const attribute = html(this).attr('href') ? 'href' : 'src';
-      const source = html(this).attr(attribute);
+  .then(() => {
+    domTree('img, script, link').each(function() {
+      const attribute = domTree(this).attr('href') ? 'href' : 'src';
+      const source = domTree(this).attr(attribute);
       const validSource = canLoad(source) ? genFileName(source, config) : source;
-      html(this).attr(attribute, validSource);
+      domTree(this).attr(attribute, validSource);
     });
-    return html;
+    return domTree;
   })
-  .then((html) => fs.writeFile(path.join(pathDir, indexHTML), html.html()))
+  .then((domTree) => fs.writeFile(path.join(pathDir, indexHTML), domTree.html()))
   .catch((error) => console.log(error));
 };

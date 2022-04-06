@@ -61,8 +61,8 @@ describe('load resources', () => {
             .reply(200, script);
             
         await pageLoader('https://page-loader.hexlet.repl.co/', tempDir);
-        // const data = await fs.readdir(tempDir);
-        // const data2 = await fs.readdir(path.join(tempDir, data));
-        // console.log(await fs.readFile(path.join(tempDir, data[0]), 'utf-8'));
+        const data = await fs.readdir(tempDir);
+        const data2 = await fs.readdir(path.join(tempDir, data[1]));
+        console.log(data2);
     });
 });
