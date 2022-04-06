@@ -52,22 +52,17 @@ const downLoadResourse = (resourcePath, hostname) => {
   return axios.get(url, { responseType: 'arraybuffer' });
 };
 
-const loadResources = (html, { hostname, mediaDirName, pathDir, url }) => {
-  const media = Array.from(html('img, link'));
-  const scripts = Array.from(html('script')).filter(
-    (resource) => resource.attribs.src
-  );
-  const resources = [...media, ...scripts];
+const loadResources = (paths, { hostname, mediaDirName, pathDir, url }) => {
+  const resources = paths.filter((path) => path);
 
-  const promises = resources.map(({ attribs }) => {
-    const source = attribs.href ? attribs.href : attribs.src;
-    const fileName = genFileName(source, { hostname, pathDir, mediaDirName });
-
+  const promises = resources.map((path) => {
+    const fileName = genFileName(path, { hostname, pathDir, mediaDirName });
+    const title = `${url}${path.slice(1)}`;
     return {
-      title: `${url}${source.slice(1)}`,
-      enabled: () => canLoad(source, hostname),
+      title,
+      enabled: () => canLoad(path, hostname),
       task: () =>
-        downLoadResourse(source, hostname)
+        downLoadResourse(path, hostname)
         .then(({ data }) => {
           return createFile(fileName, pathDir, data)
         })
