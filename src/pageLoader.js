@@ -28,5 +28,5 @@ export default async (url, pathDir = process.cwd()) => {
     return oldPaths;
   })
   .then((paths) => loadResources(paths, config))
-  .catch((error) => console.error(error));
+  .catch((error) => Promise.reject(new Error(error)));
 };
