@@ -64,3 +64,25 @@ test('Load resources', async () => {
     expect(text).toEqual(readText);
     expect(script).toEqual(readScript);
 });
+
+
+/*test('file exist', async () => {
+    nock('https://page-loader.hexlet.repl.co/')
+    .persist()
+    .get('/')
+    .reply(200, beforeHtml)
+    .get('/assets/application.css')
+    .reply(200, css)
+nock('https://page-loader.hexlet.repl.co/')
+    .get('/courses')
+    .reply(200, text)
+nock('https://page-loader.hexlet.repl.co/')
+    .get('/assets/professions/nodejs.png')
+    .reply(200, image)
+nock('https://page-loader.hexlet.repl.co/')
+    .get('/script.js')
+    .reply(200, script);
+
+    await pageLoader('https://page-loader.hexlet.repl.co/', tempDir);
+    await expect(pageLoader('https://page-loader.hexlet.repl.co/', tempDir)).rejects.toThrow();
+})*/
