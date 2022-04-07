@@ -65,7 +65,7 @@ const loadResources = (paths, { hostname, mediaDirName, pathDir, url }) => {
   });
 
   const tasks = new Listr(promises, { concurrent: true, exitOnError: false });
-  return tasks.run().catch((error) => Promise.reject(new Error(error.message)));
+  return tasks.run();
 };
 
 export {
