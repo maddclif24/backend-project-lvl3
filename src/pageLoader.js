@@ -6,7 +6,7 @@ import path from 'path';
 import { parseFileName, loadResources, canLoad, genFileName } from './utils.js';
 
 export default async (url, pathDir = process.cwd()) => {
-  const { indexHTML, mediaDirName } = parseFileName(url);
+  const { fileName, mediaDirName } = parseFileName(url);
   const { hostname } = new URL(url);
   const config = { hostname, mediaDirName, url, pathDir };
   const savedSources = [];
@@ -22,7 +22,7 @@ export default async (url, pathDir = process.cwd()) => {
       domThree(elem).attr(attribute, validSource);
     });
 
-    return fs.writeFile(path.join(pathDir, indexHTML), domThree.html());
+    return fs.writeFile(path.join(pathDir, fileName), domThree.html());
   })
   .then(() => fs.mkdir(path.join(pathDir, mediaDirName)))
   .then(() => loadResources(savedSources, config))

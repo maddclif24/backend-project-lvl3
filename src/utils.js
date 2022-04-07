@@ -3,13 +3,13 @@ import * as fs from 'fs/promises';
 import path from 'path';
 import Listr from 'listr';
 
-const parseFileName = (path) => {
-  const { origin } = new URL(path);
-  const [, slicePath] = origin.split('://');
-  const result = slicePath.split('.').join('-').split('/').join('-');
-  const indexHTML = result.concat('.html');
+const parseFileName = (url) => {
+  let [, href] = url.split('://');
+  href = href.endsWith('/') ? href.slice(0, -1) : href;
+  const result = href.split('.').join('-').split('/').join('-');
+  const fileName = result.concat('.html');
   const mediaDirName = result.concat('_files');
-  return { indexHTML, mediaDirName };
+  return { fileName, mediaDirName };
 };
 
 const isUrl = (str) => str.startsWith('http');
