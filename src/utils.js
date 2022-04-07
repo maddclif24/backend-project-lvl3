@@ -24,6 +24,7 @@ const genFileName = (src, { hostname, mediaDirName }) => {
     return path.join(mediaDirName, normalizedSrc);
   }
   normalizedSrc = path.normalize(src).split('/').join('-');
+  normalizedSrc = path.extname(normalizedSrc) ? normalizedSrc : normalizedSrc.concat('.html');
   return path.join(mediaDirName, parsedHostname).concat(normalizedSrc);
 };
 
