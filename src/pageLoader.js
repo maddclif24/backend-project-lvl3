@@ -22,8 +22,8 @@ export default async (url, pathDir = process.cwd()) => {
       domThree(elem).attr(attribute, validSource);
     });
 
-    return fs.writeFile(path.join(pathDir, fileName), domThree.html());
+    return fs.writeFile(path.resolve(path.join(pathDir, fileName)), domThree.html());
   })
-  .then(() => fs.mkdir(path.join(pathDir, mediaDirName)))
+  .then(() => fs.mkdir(path.resolve(path.join(pathDir, mediaDirName))))
   .then(() => loadResources(savedSources, config))
 };
