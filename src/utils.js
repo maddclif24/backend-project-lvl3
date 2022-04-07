@@ -19,7 +19,7 @@ const genFileName = (src, { hostname, mediaDirName }) => {
   const parsedHostname = hostname.split('.').join('-');
   if (isUrl(src)) {
     const url = new URL(src);
-    const splitSrc = url.pathname.split('/').join('-').split('.').join('-');
+    const splitSrc = url.pathname.split('/').join('-');
     normalizedSrc = parsedHostname.concat(splitSrc);
     return path.join(mediaDirName, normalizedSrc);
   }
