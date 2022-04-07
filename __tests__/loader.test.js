@@ -18,7 +18,7 @@ let afterHtml;
 let css;
 let image;
 let script;
-let text;
+let canonical;
 
 
 beforeEach(async () => {
@@ -28,7 +28,7 @@ beforeEach(async () => {
     css = await readFile('main.css');
     image = await readFile('img.png', 'base64');
     script = await readFile('script.js');
-    text = await readFile('text');
+    canonical = await readFile('canonical.html');
 });
 
 
@@ -40,7 +40,7 @@ test('Load resources', async () => {
         .reply(200, css)
     nock('https://page-loader.hexlet.repl.co/')
         .get('/courses')
-        .reply(200, text)
+        .reply(200, canonical)
     nock('https://page-loader.hexlet.repl.co/')
         .get('/assets/professions/nodejs.png')
         .reply(200, image)
@@ -51,17 +51,17 @@ test('Load resources', async () => {
     await pageLoader('https://page-loader.hexlet.repl.co/', tempDir);
     const [htmlName, mediaDirName] = await fs.readdir(tempDir);
     const mediaDir = await fs.readdir(path.join(tempDir, mediaDirName));
-    const [cssName, imageName, textName, scriptName] = mediaDir;
+    const [cssName, imageName, canonicalName, scriptName] = mediaDir;
     const readCss = await fs.readFile(path.join(tempDir, mediaDirName, cssName), 'utf-8');
     const readImage = await fs.readFile(path.join(tempDir, mediaDirName, imageName), 'utf-8');
-    const readText = await fs.readFile(path.join(tempDir, mediaDirName, textName), 'utf-8');
+    const readCanonical = await fs.readFile(path.join(tempDir, mediaDirName, canonicalName), 'utf-8');
     const readScript = await fs.readFile(path.join(tempDir, mediaDirName, scriptName), 'utf-8');
     const html = await fs.readFile(path.join(tempDir, htmlName), 'utf-8');
 
     expect(html).toEqual(afterHtml);
     expect(css).toEqual(readCss);
     expect(image).toEqual(readImage);
-    expect(text).toEqual(readText);
+    expect(canonical).toEqual(readCanonical);
     expect(script).toEqual(readScript);
 });
 
@@ -75,7 +75,7 @@ test('Files already exist', async () => {
         .reply(200, css)
     nock('https://page-loader.hexlet.repl.co/')
         .get('/courses')
-        .reply(200, text)
+        .reply(200, canonical)
     nock('https://page-loader.hexlet.repl.co/')
         .get('/assets/professions/nodejs.png')
         .reply(200, image)

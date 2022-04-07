@@ -42,7 +42,8 @@ const canLoad = (href, hostName) => {
 
 const createFile = (fileName, pathDir, data) => {
   const encoding = data.name === 'img' ? 'base64' : 'utf-8';
-  return fs.writeFile(path.join(pathDir, fileName), data, encoding, (err) => err);
+  const validFileName = path.extname(fileName) ? fileName : fileName.concat('.html');
+  return fs.writeFile(path.join(pathDir, validFileName), data, encoding, (err) => err);
 };
 
 const downLoadResourse = (resourcePath, hostname) => {
