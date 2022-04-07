@@ -18,8 +18,7 @@ export default async (url, pathDir = process.cwd()) => {
     domThree('img, script, link').each((i, elem) => {
       const attribute = domThree(elem).attr('href') ? 'href' : 'src';
       let source = domThree(elem).attr(attribute);
-      console.log(source, canLoad(source), '--------------------------');
-      const validSource = canLoad(source) ? (savedSources.push(source), genFileName(source, config)) : source;
+      const validSource = canLoad(source, hostname) ? (savedSources.push(source), genFileName(source, config)) : source;
       domThree(elem).attr(attribute, validSource);
     });
 
