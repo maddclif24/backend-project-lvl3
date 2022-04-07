@@ -60,15 +60,12 @@ const loadResources = (paths, { hostname, mediaDirName, pathDir, url }) => {
       task: () =>
         downLoadResourse(path, hostname)
           .then(({ data }) => createFile(fileName, pathDir, data))
-          .catch((error) => {
-            const description = error.message ? error.message : error.response.statusText;
-            return Promise.reject(new Error(description));
-          }),
+          .catch((error) => Promise.reject(new Error(error.message))),
     };
   });
 
   const tasks = new Listr(promises, { concurrent: true, exitOnError: false });
-  return tasks.run().catch((e) => Promise.reject(new Error(e.message)));
+  return tasks.run().catch((error) => Promise.reject(new Error(error.message)));
 };
 
 export {
