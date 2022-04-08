@@ -57,11 +57,11 @@ const loadResources = (sources, {
   hostname, mediaDirName, pathDir, url, protocol,
 }) => {
   const promises = sources.map((source) => {
-    const fileName = genFileName(path, { hostname, pathDir, mediaDirName });
+    const fileName = genFileName(source, { hostname, pathDir, mediaDirName });
     const title = `${url}${source.slice(1)}`;
     return {
       title,
-      enabled: () => canLoad(path, hostname),
+      enabled: () => canLoad(source, hostname),
       task: () => downLoadResourse(source, hostname, protocol)
         .then(({ data }) => createFile(fileName, pathDir, data))
         .catch((error) => error),
