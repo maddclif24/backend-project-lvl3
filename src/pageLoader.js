@@ -21,7 +21,7 @@ export default async (url, pathDir = process.cwd()) => {
       const validSource = canLoad(source, hostname) ? (savedSources.push(source), genFileName(source, config)) : source;
       domThree(elem).attr(attribute, validSource);
     });
-
+    // console.log(path.resolve(path.join(pathDir, fileName)))
     return fs.writeFile(path.resolve(path.join(pathDir, fileName)), domThree.html());
   })
   .then(() => fs.mkdir(path.resolve(path.join(pathDir, mediaDirName))))

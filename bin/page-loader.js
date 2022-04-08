@@ -10,7 +10,7 @@ program
   .option('-o, --output [dir]', `output dir (default: "${process.cwd()}")`)
   .action((link, path) => pageLoader(link, path.output)
     .catch((error) => {
-      console.error(error.message);
+      console.error(error);
       process.exit(1);
     }))
   .parse(process.argv);
