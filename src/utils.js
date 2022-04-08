@@ -33,10 +33,11 @@ const canLoad = (href, hostName) => {
     return false;
   }
   if (isUrl(href)) {
+    if (href.startsWith('//')) {
+      return false;
+    }
     const { hostname } = new URL(href);
     return hostname === hostName;
-  } else if (href.startsWith('//')) {
-    return false;
   }
   return true;
 };
@@ -52,17 +53,18 @@ const downLoadResourse = (resourcePath, hostname, protocol) => {
   return axios.get(url, { responseType: 'arraybuffer' });
 };
 
-const loadResources = (paths, { hostname, mediaDirName, pathDir, url, protocol }) => {
-  const promises = paths.map((path) => {
+const loadResources = (sources, {
+  hostname, mediaDirName, pathDir, url, protocol,
+}) => {
+  const promises = sources.map((source) => {
     const fileName = genFileName(path, { hostname, pathDir, mediaDirName });
-    const title = `${url}${path.slice(1)}`;
+    const title = `${url}${source.slice(1)}`;
     return {
       title,
       enabled: () => canLoad(path, hostname),
-      task: () =>
-        downLoadResourse(path, hostname, protocol)
-          .then(({ data }) => createFile(fileName, pathDir, data))
-          .catch((error) => error),
+      task: () => downLoadResourse(source, hostname, protocol)
+        .then(({ data }) => createFile(fileName, pathDir, data))
+        .catch((error) => error),
     };
   });
 

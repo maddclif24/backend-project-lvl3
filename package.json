@@ -7,6 +7,9 @@
   "bin": {
     "page-loader": "bin/page-loader.js"
   },
+  "simple-git-hooks": {
+    "pre-push": "make lint"
+  },
   "scripts": {
     "test": "npx -n --experimental-vm-modules"
   },

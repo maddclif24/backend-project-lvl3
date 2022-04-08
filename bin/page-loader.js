@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import pageLoader from '../src/pageLoader.js';
 import { program } from 'commander';
 import process from 'process';
+import pageLoader from '../src/pageLoader.js';
 
 program
   .version('0.0.1')
