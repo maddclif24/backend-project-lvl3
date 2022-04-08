@@ -62,7 +62,7 @@ const loadResources = (paths, { hostname, mediaDirName, pathDir, url }) => {
       task: () =>
         downLoadResourse(path, hostname)
           .then(({ data }) => createFile(fileName, pathDir, data))
-          .catch((error) => Promise.reject(new Error(error))),
+          .catch((error) => error),
     };
   });
 
