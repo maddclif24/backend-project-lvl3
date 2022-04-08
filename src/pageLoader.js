@@ -7,8 +7,8 @@ import { parseFileName, loadResources, canLoad, genFileName } from './utils.js';
 
 export default async (url, pathDir = process.cwd()) => {
   const { fileName, mediaDirName } = parseFileName(url);
-  const { hostname } = new URL(url);
-  const config = { hostname, mediaDirName, url, pathDir };
+  const { hostname, protocol } = new URL(url);
+  const config = { hostname, mediaDirName, url, pathDir, protocol };
   const savedSources = [];
 
   return axios.get(url)

@@ -47,12 +47,12 @@ const createFile = (fileName, pathDir, data) => {
   return fs.writeFile(path.join(pathDir, validFileName), data, encoding, (err) => err);
 };
 
-const downLoadResourse = (resourcePath, hostname) => {
-  const url = isUrl(resourcePath) ? resourcePath : `https://${hostname}${resourcePath}`;
+const downLoadResourse = (resourcePath, hostname, protocol) => {
+  const url = isUrl(resourcePath) ? resourcePath : `${protocol}//${hostname}${resourcePath}`;
   return axios.get(url, { responseType: 'arraybuffer' });
 };
 
-const loadResources = (paths, { hostname, mediaDirName, pathDir, url }) => {
+const loadResources = (paths, { hostname, mediaDirName, pathDir, url, protocol }) => {
   const promises = paths.map((path) => {
     const fileName = genFileName(path, { hostname, pathDir, mediaDirName });
     const title = `${url}${path.slice(1)}`;
@@ -60,7 +60,7 @@ const loadResources = (paths, { hostname, mediaDirName, pathDir, url }) => {
       title,
       enabled: () => canLoad(path, hostname),
       task: () =>
-        downLoadResourse(path, hostname)
+        downLoadResourse(path, hostname, protocol)
           .then(({ data }) => createFile(fileName, pathDir, data))
           .catch((error) => error),
     };
